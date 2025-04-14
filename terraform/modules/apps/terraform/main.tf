@@ -1,3 +1,4 @@
+# Install traefik
 resource "ssh_resource" "install_traefik" {
   triggers = {
     always_run = "${timestamp()}"
@@ -17,7 +18,7 @@ resource "ssh_resource" "install_traefik" {
      "ls -l /var/lib/rancher/k3s/server/manifests/",
   ]
 }
-
+# Install cert-manager
 resource "ssh_resource" "install_cert_manager" {
   triggers = {
     always_run = "${timestamp()}"

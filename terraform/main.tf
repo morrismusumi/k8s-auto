@@ -1,3 +1,4 @@
+# Deploy infrastructure
 module "infra-upcloud" {
   source = "./modules/infra/providers/upcloud/terraform"
   ssh_keys = var.ssh_keys
@@ -14,7 +15,7 @@ locals {
     woker_private_ips = module.infra-upcloud.upcloud_woker_private_ips
     kube_api_loadbalancer_dns_name = module.infra-upcloud.upcloud_lb_dns_name
 }
-
+# Install kubernetes
 module "k3s_install" {
   depends_on = [ module.infra-upcloud ]
   source = "./modules/k3s_install/terraform"
@@ -24,7 +25,6 @@ module "k3s_install" {
   worker_ips = local.worker_ips
   kube_api_loadbalancer_dns_name = local.kube_api_loadbalancer_dns_name
 }
-
 
 locals {
   install_prereq_output = module.k3s_install.ssh_resource_install_prereqs
@@ -55,7 +55,7 @@ resource "local_sensitive_file" "kubeconfig" {
   content  = replace(local.kubeconfig, "127.0.0.1", local.kube_api_loadbalancer_dns_name)
   filename = var.kubeconfig_file_path
 }
-
+# Install default apps
 module "apps_install" {
   depends_on = [ module.k3s_install ]
   source = "./modules/apps/terraform"

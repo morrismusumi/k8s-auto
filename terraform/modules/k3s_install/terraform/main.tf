@@ -1,7 +1,8 @@
+# Compute server IPs
 locals {
   control_plane_plus_worker_ips = concat(var.control_plane_ips, var.worker_ips)
 }
-
+# Install prerequisistes
 resource "ssh_resource" "install_prereqs" {
   triggers = {
     always_run = "${timestamp()}"
@@ -18,7 +19,7 @@ resource "ssh_resource" "install_prereqs" {
      "apt -y install curl",
   ]
 }
-
+# Install k3s on initial control plane node
 resource "ssh_resource" "install_k3s_server" {
   triggers = {
     always_run = "${timestamp()}"
@@ -33,7 +34,7 @@ resource "ssh_resource" "install_k3s_server" {
   ]
   depends_on = [ ssh_resource.install_prereqs ]
 }
-
+# Get k3s server token, used to join other nodes to the cluster
 resource "ssh_resource" "get_server_node_token" {
   triggers = {
     always_run = "${timestamp()}"
@@ -48,14 +49,13 @@ resource "ssh_resource" "get_server_node_token" {
   ]
   depends_on = [ ssh_resource.install_k3s_server ]
 }
-
+# Compute other required values
 locals {
   raw_server_node_token = ssh_resource.get_server_node_token.result
   server_node_token = regex(".*::server:.*", local.raw_server_node_token)
   other_control_plane_server_ips = slice(var.control_plane_ips, 1, length(var.control_plane_ips))
 }
-
-
+# Install and join other control plane nodes to the cluster
 resource "ssh_resource" "install_k3s_control_plane" {
   triggers = {
     always_run = "${timestamp()}"
@@ -72,8 +72,7 @@ resource "ssh_resource" "install_k3s_control_plane" {
   ]
   depends_on = [ ssh_resource.install_k3s_server ]
 }
-
-
+# Install and join worker nodes
 resource "ssh_resource" "install_k3s_worker" {
   triggers = {
     always_run = "${timestamp()}"
@@ -90,7 +89,7 @@ resource "ssh_resource" "install_k3s_worker" {
   ]
   depends_on = [ ssh_resource.install_k3s_control_plane ]
 }
-
+# Get kubeconfig
 resource "ssh_resource" "get_kubeconfig" {
   triggers = {
     always_run = "${timestamp()}"
@@ -105,7 +104,6 @@ resource "ssh_resource" "get_kubeconfig" {
   ]
   depends_on = [ ssh_resource.install_k3s_control_plane ]
 }
-
 
 # Outputs
 output "ssh_resource_install_prereqs" {
