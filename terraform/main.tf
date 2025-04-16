@@ -1,5 +1,5 @@
 # Deploy infrastructure
-module "infra-upcloud" {
+module "infra_upcloud" {
   source = "./modules/infra/providers/upcloud/terraform"
   ssh_keys = var.ssh_keys
   k8s_cluster_name = var.k8s_cluster_name
