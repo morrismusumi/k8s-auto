@@ -9,15 +9,15 @@ module "infra_upcloud" {
 }
 
 locals {
-    control_plane_ips = module.infra-upcloud.upcloud_server_k8s_control_plane_ips
-    worker_ips = module.infra-upcloud.upcloud_server_k8s_worker_ips
-    control_plane_private_ips = module.infra-upcloud.upcloud_control_plane_private_ips
-    woker_private_ips = module.infra-upcloud.upcloud_woker_private_ips
-    kube_api_loadbalancer_dns_name = module.infra-upcloud.upcloud_lb_dns_name
+    control_plane_ips = module.infra_upcloud.upcloud_server_k8s_control_plane_ips
+    worker_ips = module.infra_upcloud.upcloud_server_k8s_worker_ips
+    control_plane_private_ips = module.infra_upcloud.upcloud_control_plane_private_ips
+    woker_private_ips = module.infra_upcloud.upcloud_woker_private_ips
+    kube_api_loadbalancer_dns_name = module.infra_upcloud.upcloud_lb_dns_name
 }
 # Install kubernetes
 module "k3s_install" {
-  depends_on = [ module.infra-upcloud ]
+  depends_on = [ module.infra_upcloud ]
   source = "./modules/k3s_install/terraform"
   ssh_user = var.ssh_user
   ssh_pub_key_file_path = var.ssh_pub_key_file_path
