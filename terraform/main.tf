@@ -2,7 +2,12 @@
 module "infra_upcloud" {
   source = "./modules/infra/providers/upcloud/terraform"
   ssh_keys = var.ssh_keys
+  control_plane_count = var.control_plane_count
+  worker_count = var.worker_count
   k8s_cluster_name = var.k8s_cluster_name
+  k8s_cluster_network_subnet = var.k8s_cluster_network_subnet
+  k8s_loadbalancer_extra_backends = var.k8s_loadbalancer_extra_backends
+  k8s_loadbalancer_extra_frontends = var.k8s_loadbalancer_extra_frontends
   upcloud_k8s_zone = var.upcloud_k8s_zone
   upcloud_server_plan = var.upcloud_server_plan
   upcloud_server_OS = var.upcloud_server_OS
@@ -63,4 +68,3 @@ module "apps_install" {
   ssh_pub_key_file_path = var.ssh_pub_key_file_path
   control_plane_ips = local.control_plane_ips
 }
-
