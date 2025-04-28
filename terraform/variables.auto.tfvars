@@ -1,5 +1,7 @@
 # Global variables
+
 # Infra_upcloud Variables
+
 # UpCloud variables
 upcloud_k8s_zone  = "de-fra1"
 upcloud_server_plan  = "2xCPU-4GB"
@@ -12,19 +14,15 @@ control_plane_count = 1
 worker_count  = 1
 
 k8s_loadbalancer_extra_backends = [{
-  backend_port = "80"
+  backend_port = "31100"
   name = "traefik-ingress"
-},
-{
-  backend_port = "8081"
-  name = "kong-ingress"
 }
 ]
 
 k8s_loadbalancer_extra_frontends = [{
   default_backend = "traefik-ingress"
   frontend_port = "80"
-  frontend_protocol = "http"
+  frontend_protocol = "tcp"
   name = "traefik-ingress"
 }]
 

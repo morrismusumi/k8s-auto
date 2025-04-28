@@ -94,14 +94,18 @@ variable "k8s_loadbalancer_extra_frontends" {
 
 variable "control_plane_count" {
   type    = number
-  default = 3
+  default = 1
+
+  validation {
+    condition     = var.control_plane_count % 2 == 1
+    error_message = "Cannot have an even number of etcd nodes."
+  }
 }
 
 variable "worker_count" {
   type    = number
-  default = 2
+  default = 1
 }
-
 
 # K3s_install variables
 ## SSH

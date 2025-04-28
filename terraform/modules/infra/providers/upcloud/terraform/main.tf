@@ -146,40 +146,13 @@ resource "upcloud_loadbalancer_static_backend_member" "lb_be_static_member_kube_
 resource "upcloud_loadbalancer_frontend" "lb_fe_kube_api" {
   loadbalancer         = resource.upcloud_loadbalancer.k8s_lb.id
   name                 = "kube-api"
-  mode                 = "http"
+  mode                 = "tcp"
   port                 = 6443
   default_backend_name = resource.upcloud_loadbalancer_backend.lb_be_kube_api.name
   networks {
     name = resource.upcloud_loadbalancer.k8s_lb.networks[1].name
   }
 }
-# # Create traefik ingress backend
-# resource "upcloud_loadbalancer_backend" "lb_be_traefik" {
-#   loadbalancer      = resource.upcloud_loadbalancer.k8s_lb.id
-#   name              = "traefik"
-# }
-# # Add all clluster servers as memebers to traefik ingress backend
-# resource "upcloud_loadbalancer_static_backend_member" "lb_be_static_member_traefik" {
-#   count = length(local.control_plane_plus_worker_private_ips)
-#   backend      = resource.upcloud_loadbalancer_backend.lb_be_traefik.id
-#   name         = "member_traefik-${count.index + 1}"
-#   ip           = local.control_plane_plus_worker_private_ips[count.index]
-#   port         = 31100
-#   weight       = 0
-#   max_sessions = 0
-#   enabled      = true
-# }
-# # Create frontend for traefik ingress backend
-# resource "upcloud_loadbalancer_frontend" "lb_fe_traefik" {
-#   loadbalancer         = resource.upcloud_loadbalancer.k8s_lb.id
-#   name                 = "traefik"
-#   mode                 = "http"
-#   port                 = 80
-#   default_backend_name = resource.upcloud_loadbalancer_backend.lb_be_traefik.name
-#   networks {
-#     name = resource.upcloud_loadbalancer.k8s_lb.networks[1].name
-#   }
-# }
 
 # Create additional backends
 resource "upcloud_loadbalancer_backend" "lb_be_extra" {
@@ -190,7 +163,7 @@ resource "upcloud_loadbalancer_backend" "lb_be_extra" {
 
 locals {
   server_ip_port_backend_mappings = flatten(
-    [
+  [
     for ip in local.control_plane_plus_worker_private_ips : [
       for backend in var.k8s_loadbalancer_extra_backends : {
         ip = ip 
@@ -199,12 +172,16 @@ locals {
       }
     ]
   ]
-  )
+ )
 }
-# Add all clluster servers as memebers to respective backend
+
+# Add all clluster servers as members to respective backend
 resource "upcloud_loadbalancer_static_backend_member" "lb_be_static_member" {
   count        = length(local.server_ip_port_backend_mappings)
-  backend      = local.server_ip_port_backend_mappings[count.index]["backend_name"]
+  backend      = [ 
+                   for be in upcloud_loadbalancer_backend.lb_be_extra : be.id
+                   if be.name == local.server_ip_port_backend_mappings[count.index]["backend_name"]
+                 ][0]
   name         = "member_${local.server_ip_port_backend_mappings[count.index]["backend_name"]}-${count.index + 1}"
   ip           = local.server_ip_port_backend_mappings[count.index]["ip"]
   port         = local.server_ip_port_backend_mappings[count.index]["backend_port"]
@@ -214,7 +191,7 @@ resource "upcloud_loadbalancer_static_backend_member" "lb_be_static_member" {
 }
 
 
-# Create frontend for traefik ingress backend
+# Create additional frontends
 resource "upcloud_loadbalancer_frontend" "lb_fe_extra" {
   count                = length(var.k8s_loadbalancer_extra_frontends)
   loadbalancer         = resource.upcloud_loadbalancer.k8s_lb.id

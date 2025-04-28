@@ -51,7 +51,7 @@ resource "ssh_resource" "get_server_node_token" {
 }
 # Compute other required values
 locals {
-  raw_server_node_token = ssh_resource.get_server_node_token.result
+  raw_server_node_token = sensitive(ssh_resource.get_server_node_token.result)
   server_node_token = regex(".*::server:.*", local.raw_server_node_token)
   other_control_plane_server_ips = slice(var.control_plane_ips, 1, length(var.control_plane_ips))
 }
@@ -124,4 +124,5 @@ output "ssh_resource_install_k3s_worker" {
 
 output "ssh_resource_get_kubeconfig" {
   value = ssh_resource.get_kubeconfig.result
+  sensitive = true
 }

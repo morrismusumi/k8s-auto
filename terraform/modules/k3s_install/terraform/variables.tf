@@ -18,4 +18,5 @@ variable "ssh_user" {
 
 variable "kube_api_loadbalancer_dns_name" {
   type    = string
+  default = "k8s-auto"
 }
