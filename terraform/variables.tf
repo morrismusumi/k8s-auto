@@ -1,4 +1,8 @@
 # Global variables
+variable "infrastructure_provider" {
+  type    = string 
+}
+
 variable "kubeconfig_file_path" {
   type    = string 
 }
@@ -8,6 +12,56 @@ variable "ssh_keys" {
   type = list(string)
   description = "List of SSH public keys"
 }
+## Proxmox
+variable "proxmox_api_url" {
+  type = string
+}
+
+variable "proxmox_node" {
+  type = string
+}
+
+variable "proxmox_cloudinit_template_name" {
+  type = string
+}
+
+# Cluster variables
+variable "proxmox_k8s_network_subnet_mask" {
+  type    = string
+  default = "24"
+}
+variable "proxmox_k8s_network_gateway" {
+  type    = string
+}
+
+variable "proxmox_k8s_network_dns" {
+  type    = string
+}
+
+variable "kube_vip_address" {
+  type    = string
+}
+variable "proxmox_vm_plan" {
+  type = map(string)
+  default = {
+    "cpu": "host"
+    "cores": 2
+    "memory": 4094
+    "disk": "40G"
+  }
+}
+
+variable "proxmox_vm_storage" {
+  type    = string
+}
+
+variable "proxmox_vm_network_bridge" {
+  type    = string
+  default = "vmbr0"
+}
+
+
+
 ## Upcloud
 variable "upcloud_k8s_zone" {
   type    = string
@@ -117,4 +171,20 @@ variable "ssh_pub_key_file_path" {
 variable "ssh_user" {
   type    = string 
   default = "root"
+}
+
+
+variable "kube_api_server_port" {
+  type    = string
+  default = "6443"
+}
+
+variable "kube_vip_enable" {
+  type    = bool
+  default = false
+}
+
+variable "kube_vip_interface" {
+  type    = string
+  default = "eth0"
 }

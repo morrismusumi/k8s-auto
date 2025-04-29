@@ -205,22 +205,22 @@ resource "upcloud_loadbalancer_frontend" "lb_fe_extra" {
 }
 
 # Outputs
-output "upcloud_server_k8s_control_plane_ips" {
+output "k8s_control_plane_ips" {
   value = [for server in upcloud_server.k8s_control_plane : server.network_interface[0].ip_address]
 }
 
-output "upcloud_server_k8s_worker_ips" {
+output "k8s_worker_ips" {
   value = [for server in upcloud_server.k8s_worker : server.network_interface[0].ip_address]
 }
 
-output "upcloud_control_plane_private_ips" {
+output "k8s_control_plane_private_ips" {
   value = local.control_plane_private_ips
 }
 
-output "upcloud_woker_private_ips" {
+output "k8s_worker_private_ips" {
   value = local.worker_private_ips
 }
 
-output "upcloud_lb_dns_name" {
+output "kube_api_loadbalancer_dns_name" {
   value = local.lb_dns_name
 }
