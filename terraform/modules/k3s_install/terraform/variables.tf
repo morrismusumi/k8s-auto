@@ -20,3 +20,25 @@ variable "kube_api_loadbalancer_dns_name" {
   type    = string
   default = "k8s-auto"
 }
+
+variable "kube_api_server_port" {
+  type    = string
+  default = "6443"
+}
+
+variable "kube_vip_interface" {
+  type    = string
+  default = "eth0"
+}
+
+variable "kube_vip_enable" {
+  type    = bool
+  default = false
+}
+
+
+variable "kube_vip_address" {
+  type    = string
+}
+
+
